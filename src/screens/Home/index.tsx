@@ -41,6 +41,12 @@ export default function Home() {
     ));
   }
 
+  function handleTaskEdit(oldDescription: string, newDescription: string) {
+    setTasks(prevState => prevState.map(task =>
+      task.description === oldDescription ? { ...task, description: newDescription } : task
+    ));
+  }
+
   const completedTasksCount = tasks.filter(task => task.completed).length;
   
   return (
@@ -91,6 +97,7 @@ export default function Home() {
                             task={item}
                             onRemove={() => handleTaskRemove(item.description)}
                             onToggle={() => handleTaskToggle(item.description)}
+                            onEdit={(newDescription) => handleTaskEdit(item.description, newDescription)}
                         />
                     )}
                     showsVerticalScrollIndicator={false}

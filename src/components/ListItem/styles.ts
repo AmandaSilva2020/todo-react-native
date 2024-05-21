@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 8
     },
+    textInput: {
+        flex: 1,
+        color: '#fff'
+      },
     checkboxBase: {
         width: 24,
         height: 24,
@@ -25,7 +29,6 @@ export const styles = StyleSheet.create({
         borderColor: "#5E60CE"
     },
     taskUndone:{
-        flex: 1,
         color: "#F2F2F2"
     },
     taskDone: {

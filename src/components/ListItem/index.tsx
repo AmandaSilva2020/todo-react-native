@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
+import { View, Text, Image, Pressable, TouchableOpacity, TextInput } from "react-native";
 import { styles } from "./styles"
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
@@ -8,6 +8,7 @@ type ListItemProps = {
   task: Task;
   onRemove: () => void;
   onToggle: () => void;
+  onEdit: (newDescription: string) => void;
 }
 
 type CheckBoxProps = {
@@ -15,13 +16,33 @@ type CheckBoxProps = {
   checked: boolean;
 }
 
-export function ListItem({task, onRemove, onToggle}: ListItemProps){
+export function ListItem({task, onRemove, onToggle, onEdit}: ListItemProps){
+    const [isEditing, setIsEditing] = useState(false);
+    const [newDescription, setNewDescription] = useState(task.description);
+
+    function handleEditSubmit() {
+      onEdit(newDescription);
+      setIsEditing(false);
+    }
+
     return(
         <View style={styles.container}>
             <Checkbox onChange={onToggle} checked={task.completed} />
-            <Text style={[styles.taskUndone, task.completed && styles.taskDone]}>
-                {task.description}
-            </Text>
+            {isEditing ? (
+              <TextInput
+                style={styles.textInput}
+                value={newDescription}
+                onChangeText={setNewDescription}
+                onBlur={handleEditSubmit}
+                onSubmitEditing={handleEditSubmit}
+              />
+            ) : (
+              <Pressable style={{flex: 1}} onPress={() => setIsEditing(true)}>
+                <Text style={[styles.taskUndone, task.completed && styles.taskDone]}>
+                  {task.description}
+                </Text>
+              </Pressable>
+            )}
             <TouchableOpacity onPress={onRemove}>
                 <Ionicons name="trash-outline" size={20} color="#808080" style={{marginLeft: 2}} />
             </TouchableOpacity>
