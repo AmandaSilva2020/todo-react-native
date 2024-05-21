@@ -37,7 +37,7 @@ export function ListItem({task, onRemove, onToggle, onEdit}: ListItemProps){
                 onSubmitEditing={handleEditSubmit}
               />
             ) : (
-              <Pressable style={{flex: 1}} onPress={() => setIsEditing(true)}>
+              <Pressable style={{flex: 1}} onPress={() => !task.completed && setIsEditing(true)}>
                 <Text style={[styles.taskUndone, task.completed && styles.taskDone]}>
                   {task.description}
                 </Text>
