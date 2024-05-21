@@ -1,8 +1,48 @@
-import { View, Image, TextInput, TouchableOpacity } from "react-native";
+import { View, Image, Text, TextInput, TouchableOpacity, FlatList, Alert } from "react-native";
 import { styles } from "./styles";
-import { Tasks } from "@/src/components/Tasks";
+import { useState } from "react";
+import { ListItem } from "@/src/components/ListItem";
+import { Empty } from "@/src/components/Empty";
+
+export type Task = {
+  description: string;
+  completed: boolean;
+};
 
 export default function Home() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskDescription, setTaskDescription] = useState('');
+  
+  function handleTaskAdd(){
+    if(tasks.some(task => task.description === taskDescription)){
+      return Alert.alert("Tarefa Existe", "Já cadastrou essa tarefa");
+    }
+
+    setTasks(prevState => [...prevState, { description: taskDescription, completed: false }]);
+    setTaskDescription('');
+  }
+  
+  function handleTaskRemove(taskDescription: string){
+    Alert.alert("Remover", `Remover a tarefa ${taskDescription}?`, [
+        {
+            text: 'Sim',
+            onPress: () => setTasks(prevState => prevState.filter(task => task.description !== taskDescription))
+        },
+        {
+            text: "Não",
+            style: 'cancel'
+        }
+    ])
+  }
+
+  function handleTaskToggle(taskDescription: string) {
+    setTasks(prevState => prevState.map(task => 
+      task.description === taskDescription ? { ...task, completed: !task.completed } : task
+    ));
+  }
+
+  const completedTasksCount = tasks.filter(task => task.completed).length;
+  
   return (
     <View
       style={styles.container}
@@ -16,8 +56,10 @@ export default function Home() {
           style={styles.input}
           placeholder="Adicione uma nova tarefa"
           placeholderTextColor= "#808080"
+          onChangeText={setTaskDescription}
+          value={taskDescription}
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleTaskAdd}>
           <Image 
             source={require('./../../assets/plus.png')}
           />
@@ -25,7 +67,39 @@ export default function Home() {
 
       </View>
       <View style={styles.contentBox}>
-        <Tasks />
+        <View style={styles.listContainer}>
+              <View style={styles.row}>
+                  <View style={styles.col}>
+                      <Text style={[styles.textItems, {color: "#4EA8DE"}]}>Criadas</Text>
+                      <View style={styles.span}>
+                          <Text style={[styles.textItems, {color: "#fff"}]}>{tasks.length}</Text>
+                      </View>
+                  </View>
+                  <View style={styles.col}>
+                      <Text style={[styles.textItems, {color: "#8284FA"}]}>Concluídas</Text>
+                      <View style={styles.span}>
+                          <Text style={[styles.textItems, {color: "#fff"}]}>{completedTasksCount}</Text>
+                      </View>
+                  </View>
+              </View>
+              <FlatList 
+                    data={tasks}
+                    keyExtractor={item => item.description}
+                    renderItem={({item}) => (
+                        <ListItem 
+                            key={item.description}
+                            task={item}
+                            onRemove={() => handleTaskRemove(item.description)}
+                            onToggle={() => handleTaskToggle(item.description)}
+                        />
+                    )}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={() => (
+                      <Empty />
+                    )}
+
+                />
+          </View>
       </View>
     </View>
   );
